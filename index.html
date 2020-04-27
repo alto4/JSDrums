@@ -1,52 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>JS Drum Kit</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-<body>
-
-
+  <body>
     <div class="keys">
-        <div data-key="65" class="key">
-            <kbd>A</kbd>
-            <span class="sound">clap</span>
-        </div>
-        <div data-key="83" class="key">
-            <kbd>S</kbd>
-            <span class="sound">hihat</span>
-        </div>
-        <div data-key="68" class="key">
-            <kbd>D</kbd>
-            <span class="sound">kick</span>
-        </div>
-        <div data-key="70" class="key">
-            <kbd>F</kbd>
-            <span class="sound">openhat</span>
-        </div>
-        <div data-key="71" class="key">
-            <kbd>G</kbd>
-            <span class="sound">boom</span>
-        </div>
-        <div data-key="72" class="key">
-            <kbd>H</kbd>
-            <span class="sound">ride</span>
-        </div>
-        <div data-key="74" class="key">
-            <kbd>J</kbd>
-            <span class="sound">snare</span>
-        </div>
-        <div data-key="75" class="key">
-            <kbd>K</kbd>
-            <span class="sound">tom</span>
-        </div>
-        <div data-key="76" class="key">
-            <kbd>L</kbd>
-            <span class="sound">tink</span>
-        </div>
+      <div data-key="65" class="key">
+        <kbd>A</kbd>
+        <span class="sound">clap</span>
+      </div>
+      <div data-key="83" class="key">
+        <kbd>S</kbd>
+        <span class="sound">hihat</span>
+      </div>
+      <div data-key="68" class="key">
+        <kbd>D</kbd>
+        <span class="sound">kick</span>
+      </div>
+      <div data-key="70" class="key">
+        <kbd>F</kbd>
+        <span class="sound">openhat</span>
+      </div>
+      <div data-key="71" class="key">
+        <kbd>G</kbd>
+        <span class="sound">boom</span>
+      </div>
+      <div data-key="72" class="key">
+        <kbd>H</kbd>
+        <span class="sound">ride</span>
+      </div>
+      <div data-key="74" class="key">
+        <kbd>J</kbd>
+        <span class="sound">snare</span>
+      </div>
+      <div data-key="75" class="key">
+        <kbd>K</kbd>
+        <span class="sound">tom</span>
+      </div>
+      <div data-key="76" class="key">
+        <kbd>L</kbd>
+        <span class="sound">tink</span>
+      </div>
     </div>
 
     <audio data-key="65" src="sounds/clap.wav"></audio>
@@ -60,10 +57,42 @@
     <audio data-key="76" src="sounds/tink.wav"></audio>
 
     <script>
+      // playSound Funciton - when a key is pressed that corresponds to the associated data-key, trigger the associated audio file
+      function playSound(e) {
+        // Target audio elements based on correspond data key that aligns with keyboard code
+        const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`);
+        const key = document.querySelector(`.key[data-key="${e.keyCode}"]`);
 
+        // If no corresponding audio element exists with the key pressed, then ignore it
+        if (!audio) return;
+
+        // Rewind audio excerpt to the beginning so that it can be pressed multiple times before it's entire duration is complete
+        audio.currentTime = 0;
+        audio.play();
+
+        // Add the playing class to whatever key is being pressed to change border color and trigger animations
+        key.classList.add("playing");
+      }
+
+      // removeTransition Function - once event has triggered the corresponding audio clip, remove the playing class so the key can be re-pressed, and also
+      // ignore all transition end events aside from the transform event so each keystroke only triggers one playthrough of the audio clip
+      function removeTransition(e) {
+        // Skip over all properties that change, except for transform event
+        if (e.propertyName !== "transform") {
+          return;
+        }
+        // Remove the playing class
+        this.classList.remove("playing");
+      }
+
+      // Add a transitionend event listener to each element with the class of key inside of the node list, which will trigger the removeTransition function
+      const keys = document.querySelectorAll(".key");
+      keys.forEach((key) =>
+        key.addEventListener("transitionend", removeTransition)
+      );
+
+      // Listen for keydown event
+      window.addEventListener("keydown", playSound);
     </script>
-
-
-</body>
-
+  </body>
 </html>
